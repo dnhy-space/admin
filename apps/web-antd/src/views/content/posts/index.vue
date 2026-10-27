@@ -3,10 +3,12 @@ import { onMounted, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import {
+  archivePostApi,
   deletePostApi,
   getPostsApi,
   hidePostApi,
   publishPostApi,
+  unarchivePostApi,
 } from '#/api/content';
 import type { PostListItem, PostType, PostVisibility } from '#/api/content';
 import { formatDateTime } from '#/utils/format';
@@ -23,6 +25,7 @@ const total = ref(0);
 
 const query = reactive({
   filter: '',
+  isArchived: undefined as boolean | undefined,
   page: 1,
   pageSize: 10,
   type: undefined as PostType | undefined,
@@ -33,9 +36,10 @@ const columns = [
   { dataIndex: 'title', ellipsis: true, key: 'title', title: '标题' },
   { key: 'type', title: '类型', width: 90 },
   { key: 'visibility', title: '可见性', width: 90 },
+  { key: 'isArchived', title: '归档', width: 90 },
   { dataIndex: 'occurredAt', key: 'occurredAt', title: '时间', width: 170 },
   { key: 'stats', title: '互动', width: 110 },
-  { key: 'action', title: '操作', width: 210 },
+  { key: 'action', title: '操作', width: 280 },
 ];
 
 async function fetchData() {
@@ -43,6 +47,7 @@ async function fetchData() {
   try {
     const result = await getPostsApi({
       Filter: query.filter || undefined,
+      IsArchived: query.isArchived,
       MaxResultCount: query.pageSize,
       SkipCount: (query.page - 1) * query.pageSize,
       Type: query.type,
@@ -83,6 +88,17 @@ async function toggleVisibility(record: PostListItem) {
 async function remove(record: PostListItem) {
   await deletePostApi(record.id);
   message.success('已删除');
+  await fetchData();
+}
+
+async function toggleArchive(record: PostListItem) {
+  if (record.isArchived) {
+    await unarchivePostApi(record.id);
+    message.success('已取消归档');
+  } else {
+    await archivePostApi(record.id);
+    message.success('已归档');
+  }
   await fetchData();
 }
 
@@ -130,6 +146,16 @@ onMounted(fetchData);
           <a-select-option :value="2">公开</a-select-option>
           <a-select-option :value="1">私密</a-select-option>
         </a-select>
+        <a-select
+          v-model:value="query.isArchived"
+          allow-clear
+          placeholder="归档状态"
+          style="width: 120px"
+          @change="resetAndFetch"
+        >
+          <a-select-option :value="false">未归档</a-select-option>
+          <a-select-option :value="true">已归档</a-select-option>
+        </a-select>
       </a-space>
 
       <a-table
@@ -168,6 +194,11 @@ onMounted(fetchData);
             </a-tag>
           </template>
 
+          <template v-else-if="column.key === 'isArchived'">
+            <a-tag v-if="record.isArchived" color="orange">已归档</a-tag>
+            <span v-else class="text-sm text-gray-400">—</span>
+          </template>
+
           <template v-else-if="column.key === 'occurredAt'">
             <span class="text-sm text-gray-600">
               {{ formatDateTime(record.occurredAt) }}
@@ -191,6 +222,9 @@ onMounted(fetchData);
               </a-button>
               <a-button size="small" type="link" @click="toggleVisibility(record)">
                 {{ record.visibility === 2 ? '设为私密' : '公开' }}
+              </a-button>
+              <a-button size="small" type="link" @click="toggleArchive(record)">
+                {{ record.isArchived ? '取消归档' : '归档' }}
               </a-button>
               <a-popconfirm
                 cancel-text="取消"

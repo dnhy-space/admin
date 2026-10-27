@@ -47,6 +47,15 @@ const routes: RouteRecordRaw[] = [
         path: 'schedule',
       },
       {
+        component: () => import('#/views/content/deadline/index.vue'),
+        meta: {
+          icon: 'lucide:timer',
+          title: 'Deadline',
+        },
+        name: 'ContentDeadline',
+        path: 'deadline',
+      },
+      {
         component: () => import('#/views/content/comments/index.vue'),
         meta: {
           icon: 'lucide:message-square',

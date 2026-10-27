@@ -20,6 +20,7 @@ export interface PostListItem {
   commentCount: number;
   creationTime: string;
   id: string;
+  isArchived: boolean;
   isLikedByMe: boolean;
   likeCount: number;
   occurredAt: string;
@@ -70,6 +71,37 @@ export interface CreateUpdateScheduleInput {
   notes?: null | string;
   startTime: string;
   title: string;
+}
+
+export type DeadlineStatus = 1 | 2 | 3;
+
+export const DEADLINE_STATUS_LABEL: Record<DeadlineStatus, string> = {
+  1: '进行中',
+  2: '即将到期',
+  3: '已过期',
+};
+
+export interface DeadlineItem {
+  accentColor?: null | string;
+  creationTime: string;
+  daysRemaining: number;
+  description?: null | string;
+  dueDate: string;
+  id: string;
+  progressPercent: number;
+  projectName: string;
+  sortOrder: number;
+  startDate: string;
+  status: DeadlineStatus;
+}
+
+export interface CreateUpdateDeadlineInput {
+  accentColor?: null | string;
+  description?: null | string;
+  dueDate: string;
+  projectName: string;
+  sortOrder: number;
+  startDate: string;
 }
 
 export interface DashboardSummary {

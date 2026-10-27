@@ -11,6 +11,7 @@ import type {
 
 export interface GetPostsParams {
   Filter?: string;
+  IsArchived?: boolean;
   MaxResultCount?: number;
   SkipCount?: number;
   Type?: PostType;
@@ -48,4 +49,12 @@ export async function publishPostApi(id: string) {
 
 export async function hidePostApi(id: string) {
   return await requestClient.post<PostDetail>(`/api/posts/${id}/hide`);
+}
+
+export async function archivePostApi(id: string) {
+  return await requestClient.post<PostDetail>(`/api/posts/${id}/archive`);
+}
+
+export async function unarchivePostApi(id: string) {
+  return await requestClient.post<PostDetail>(`/api/posts/${id}/unarchive`);
 }
