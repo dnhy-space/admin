@@ -43,7 +43,7 @@
     "@vueuse/core": "catalog:",
     "ant-design-vue": "catalog:",
     "dayjs": "catalog:",
-    "md-editor-v3": "^7.1.0",
+    "md-editor-v3": "^7.1.1",
     "pinia": "catalog:",
     "vue": "catalog:",
     "vue-router": "catalog:"
